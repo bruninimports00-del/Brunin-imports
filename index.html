@@ -124,8 +124,8 @@ h1{font-size:clamp(2.4rem,11vw,5.6rem)}h2{font-size:clamp(1.9rem,6.5vw,3.4rem)}
 .sb:focus-within{box-shadow:0 0 0 2px var(--blue2)}
 .cat{margin-top:26px}.ct{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
 .ct h3{font:800 1.7rem var(--fd);text-transform:uppercase}.ct span{font-size:.8rem;color:var(--mut)}
-.grid{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;margin:12px calc(var(--sp)*-1) 0;padding:2px var(--sp) 14px;scroll-padding-left:var(--sp);scrollbar-width:thin}
-.pc{flex:0 0 clamp(158px,45vw,230px);scroll-snap-align:start;background:var(--grey);border:1px solid var(--line);border-radius:12px;padding:8px 8px 12px;gap:6px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:12px 0 0;padding:2px 0 14px}
+.pc{min-width:0;background:var(--grey);border:1px solid var(--line);border-radius:12px;padding:8px 8px 12px;gap:6px}
 .pimg{aspect-ratio:1/1;border-radius:8px}
 .pc h3{font:600 .8rem var(--fb);min-height:2.5em;margin-top:4px}
 .pp strong{font-size:1.45rem}.pp small{font-size:.75rem}.pc2{font-size:.74rem}
@@ -133,6 +133,11 @@ h1{font-size:clamp(2.4rem,11vw,5.6rem)}h2{font-size:clamp(1.9rem,6.5vw,3.4rem)}
 .buy{align-self:stretch;width:100%;min-height:42px;padding:0 10px;font-size:.85rem;margin-top:6px}
 @media(min-width:900px){.grid{display:grid;grid-template-columns:repeat(4,1fr);overflow:visible;margin:12px 0 0;padding:2px 0 14px}.pc{flex:auto}}
 .col{padding:18px 0}.cols{margin-top:24px}.col p{margin-top:6px}
+.pimg{cursor:zoom-in;position:relative}.pimg::after{content:"+";position:absolute;right:8px;bottom:8px;width:30px;height:30px;border-radius:50%;background:rgba(3,8,24,.75);border:1px solid rgba(255,255,255,.3);color:#fff;display:grid;place-items:center;font:700 1.2rem/1 var(--fb)}
+.lb{position:fixed;inset:0;z-index:80;background:rgba(2,5,15,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:calc(64px + env(safe-area-inset-top,0px)) 16px calc(20px + env(safe-area-inset-bottom,0px))}
+.lb img{max-width:100%;max-height:calc(100svh - 240px);object-fit:contain;border-radius:8px}
+.lb p{margin:0;font-weight:600;text-align:center}
+.lbx{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:14px;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.1);color:#fff;font-size:1.7rem;line-height:1;cursor:pointer}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -209,22 +214,25 @@ h1{font-size:clamp(2.4rem,11vw,5.6rem)}h2{font-size:clamp(1.9rem,6.5vw,3.4rem)}
 <div class="dn"><a class="btn btn-dark" data-wa href="#">Pedir no WhatsApp</a><a class="btn btn-line" href="https://www.instagram.com/brunin_imports_" target="_blank" rel="noopener">Instagram</a><p>Para as categorias sem foto no site, toque e consulte a disponibilidade com a loja. Envio para todo o Brasil · Não realizamos trocas.</p></div>
 </nav>
 <div class="sticky" id="sticky"><a class="btn btn-dark" data-wa href="#produto">WhatsApp</a><a class="btn btn-line" href="https://www.instagram.com/brunin_imports_" target="_blank" rel="noopener">Instagram</a></div>
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Foto ampliada" hidden><button class="lbx" id="lbx" aria-label="Fechar foto">×</button><img alt=""><p id="lbc"></p><a class="btn btn-dark" id="lbbuy" href="#">Pedir esta peça</a></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 // Coloque o número da loja com DDI+DDD, só dígitos. Ex.: "5561999999999". Se vazio, o pedido vai para o Instagram.
-const WA_NUMBER="";
+const WA_NUMBER="5561992344134";
 const IG="https://ig.me/m/brunin_imports_";
 const $=s=>document.querySelector(s);
 function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),3200)}
-function link(text){return WA_NUMBER?`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`:IG}
+function link(text){return WA_NUMBER?`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`:"#"}
+const noWA="O número do WhatsApp da loja ainda não foi cadastrado.";
 const shirt=$("#imgShirt");if(shirt)shirt.src=$(".hero-img").src;
 function setLinks(){document.querySelectorAll("[data-wa]").forEach(a=>{const c=a.closest(".pc");if(!c){a.href=link("Olá, Brunin Imports! Vi o site e quero fazer um pedido.");return}
 const sz=c.querySelector(".opt[aria-pressed=true]");const pr=c.dataset.price;
 a.href=link(pr?`Olá, Brunin Imports! Quero pedir o ${c.dataset.name}${sz?`, tamanho ${sz.textContent}`:""} (${pr} no Pix).`:`Olá, Brunin Imports! Quero saber valores e tamanhos da ${c.dataset.name}.`)})}
 document.querySelectorAll(".sz .opt").forEach(b=>b.onclick=()=>{b.parentNode.querySelectorAll(".opt").forEach(x=>x.setAttribute("aria-pressed",x===b));setLinks()});
 setLinks();
-document.querySelectorAll("[data-wa]").forEach(a=>a.addEventListener("click",()=>toast(WA_NUMBER?"Abrindo o WhatsApp…":"Abrindo o Instagram da loja…")));
+document.querySelectorAll("[data-wa]").forEach(a=>a.addEventListener("click",e=>{if(!WA_NUMBER){e.preventDefault();toast(noWA)}else toast("Abrindo o WhatsApp…")}));
+document.querySelectorAll("[data-cat]").forEach(a=>a.addEventListener("click",e=>{if(!WA_NUMBER){e.preventDefault();toast(noWA)}}));
 const dr=$("#drawer"),sc=$("#scrim"),mb=$("#menuBtn");
 function menu(o,r){dr.classList.toggle("open",o);sc.classList.toggle("open",o);mb.setAttribute("aria-expanded",o);document.documentElement.style.overflow=o?"hidden":"";if(o)$("#dx").focus({preventScroll:true});else if(r)mb.focus({preventScroll:true})}
 mb.onclick=()=>menu(true);$("#dx").onclick=()=>menu(false,true);sc.onclick=()=>menu(false,true);
@@ -233,6 +241,12 @@ document.querySelectorAll("[data-cat]").forEach(a=>a.href=link(`Olá, Brunin Imp
 dr.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>menu(false)));
 const q=$("#q");if(q){const nz=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 q.addEventListener("input",()=>{const v=nz(q.value.trim());let n=0;document.querySelectorAll(".cat").forEach(c=>{let k=0;c.querySelectorAll(".pc").forEach(a=>{const ok=!v||nz(a.dataset.name).includes(v);a.hidden=!ok;if(ok)k++});c.hidden=!k;n+=k});$("#empty").hidden=n>0})}
+const lb=$("#lb"),lbi=lb.querySelector("img"),lbb=$("#lbbuy");let lbFrom=null;
+function lbOpen(p){const c=p.closest(".pc"),im=p.querySelector("img");lbi.src=im.src;lbi.alt=im.alt;$("#lbc").textContent=c.dataset.name;const b=c.querySelector(".buy");lbb.href=b.href;lbb.textContent=b.textContent==="Comprar"?"Pedir esta peça":"Perguntar sobre esta peça";lb.hidden=false;document.documentElement.style.overflow="hidden";lbFrom=p;$("#lbx").focus({preventScroll:true})}
+function lbClose(){lb.hidden=true;document.documentElement.style.overflow="";lbi.removeAttribute("src");if(lbFrom)lbFrom.focus({preventScroll:true})}
+document.querySelectorAll(".pimg").forEach(p=>{p.tabIndex=0;p.setAttribute("role","button");p.setAttribute("aria-label","Ampliar foto: "+p.closest(".pc").dataset.name);p.onclick=()=>lbOpen(p);p.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();lbOpen(p)}}});
+$("#lbx").onclick=lbClose;lb.addEventListener("click",e=>{if(e.target===lb)lbClose()});lbb.addEventListener("click",e=>{lb.hidden=true;document.documentElement.style.overflow="";if(!WA_NUMBER){e.preventDefault();toast(noWA)}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!lb.hidden)lbClose()});
 const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add("in");io.unobserve(x.target)}}),{threshold:.12});
 document.querySelectorAll(".rv").forEach(e=>io.observe(e));
 new IntersectionObserver(e=>$("#sticky").classList.toggle("show",!e[0].isIntersecting)).observe($(".hero"));
